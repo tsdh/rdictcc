@@ -1,0 +1,5 @@
+2007-08-26  Tassilo Horn  <tassilo@member.fsf.org>
+
+	* rdictcc.el (rdictcc-translate-word-to-string): Set
+	coding-system-for-{read,write} to terminal-coding-system.
+

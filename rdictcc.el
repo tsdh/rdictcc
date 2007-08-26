@@ -61,8 +61,10 @@ are only available in GNU Emacs' X11 interface."
   "Translates the given word and returns the result as string."
   (if (equal word rdictcc-last-word)
       rdictcc-last-translation
-    (let ((translation (shell-command-to-string
-                        (concat rdictcc-program " " word))))
+    (let* ((coding-system-for-read  (terminal-coding-system))
+           (coding-system-for-write (terminal-coding-system))
+           (translation (shell-command-to-string
+                         (concat rdictcc-program " " word))))
       (setq rdictcc-last-word word)
       (setq rdictcc-last-translation translation))))
 
