@@ -54,7 +54,7 @@ are only available in GNU Emacs' X11 interface."
 (defvar rdictcc-last-translation nil
   "The last translation (internal use only)")
 
-(defvar rdictcc-version "<2007-03-04 Sun 21:50>"
+(defvar rdictcc-version "<2007-09-05 Wed 11:30>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
@@ -78,8 +78,10 @@ behavior. The *rdictcc* buffer has his own major mode with useful
 key bindings. Type `?' in it to get a description."
   (interactive (list (let ((inhibit-read-only t))
                        (substring-no-properties
-                        (read-string "Word to translate: "
-                                     (word-at-point))))))
+                        (read-string (concat "Word to translate (defaults to \""
+                                             (rdictcc-current-word)
+                                             "\"): ")
+                                     nil nil (rdictcc-current-word))))))
   (let ((translation (rdictcc-translate-word-to-string word)))
     (when rdictcc-show-translations-in-buffer
       (rdictcc-pop-to-translation-buffer translation))
@@ -94,10 +96,10 @@ key bindings. Type `?' in it to get a description."
   (setq rdictcc-old-window-configuration (current-window-configuration))
   (pop-to-buffer "*rdictcc*" nil t)
   (rdictcc-buffer-mode)
-  (setq buffer-read-only nil)
+  (setq inhibit-read-only t)
   (erase-buffer)
   (insert translation)
-  (setq buffer-read-only t)
+  (setq inhibit-read-only nil)
   (goto-char (point-min))
   (rdictcc-next-translation))
 
