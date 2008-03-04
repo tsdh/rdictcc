@@ -1,8 +1,11 @@
 ;;; rdictcc.el --- use the rdictcc.rb client from within Emacs
 
-;; Copyright (C) 2006, 2007 by Tassilo Horn
+;; Copyright (C) 2006, 2007, 2008 by Tassilo Horn
 
 ;; Author: Tassilo Horn <tassilo@member.fsf.org>
+
+;; Patches and contributions:
+;;   - Richard G Riley <rileyrgdev@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by the Free
@@ -34,6 +37,12 @@ and convenient German-English (and vice versa) translation."
   :group 'rdictcc
   :type 'string)
 
+(defcustom rdictcc-buffer
+  "*rdictcc*"
+  "The name of the buffer showing the translations."
+  :group 'rdictcc
+  :type 'string)
+
 (defcustom rdictcc-show-translations-in-tooltips
   nil
   "If set to t, translations will be shown in tooltips. Tooltips
@@ -54,7 +63,7 @@ are only available in GNU Emacs' X11 interface."
 (defvar rdictcc-last-translation nil
   "The last translation (internal use only)")
 
-(defvar rdictcc-version "<2007-09-05 Wed 11:30>"
+(defvar rdictcc-version "<2008-03-04 Tue 20:37>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
@@ -68,23 +77,24 @@ are only available in GNU Emacs' X11 interface."
       (setq rdictcc-last-word word)
       (setq rdictcc-last-translation translation))))
 
-(defun rdictcc-translate-word (word)
-  "Asks the use for a word and translates it with
-`rdictcc-program'. The result will be displayed in a window with
-*rdictcc* buffer or/and in a tooltip. The variables
-`rdictcc-show-translations-in-buffer' and
+(defun rdictcc-translate-word (word noselect)
+  "Translate WORD and show translation in `rdictcc-buffer' and/or a tooltip.
+If NOSELECT the `rdictcc-buffer' won't be selected.  This
+argument is the prefix arg.
+The variables `rdictcc-show-translations-in-buffer' and
 `rdictcc-show-translations-in-tooltips' influence this
-behavior. The *rdictcc* buffer has his own major mode with useful
+behavior. The `rdictcc-buffer' has his own major mode with useful
 key bindings. Type `?' in it to get a description."
-  (interactive (list (let ((inhibit-read-only t))
-                       (substring-no-properties
-                        (read-string (concat "Word to translate (defaults to \""
-                                             (rdictcc-current-word)
-                                             "\"): ")
-                                     nil nil (rdictcc-current-word))))))
+  (interactive
+   (list (let ((inhibit-read-only t)
+               (cw (rdictcc-current-word)))
+           (substring-no-properties
+            (read-string (concat "Word to translate (defaults to \"" cw "\"): ")
+                         nil nil cw)))
+         current-prefix-arg))
   (let ((translation (rdictcc-translate-word-to-string word)))
     (when rdictcc-show-translations-in-buffer
-      (rdictcc-pop-to-translation-buffer translation))
+      (rdictcc-show-translation-buffer translation noselect))
     (when (and rdictcc-show-translations-in-tooltips window-system)
       (tooltip-show translation))))
 
@@ -92,9 +102,12 @@ key bindings. Type `?' in it to get a description."
   "The window configuration which has to be restored when the
 *rdictcc* buffer is closed. (internal use only)")
 
-(defun rdictcc-pop-to-translation-buffer (translation)
+(defun rdictcc-show-translation-buffer (translation noselect)
   (setq rdictcc-old-window-configuration (current-window-configuration))
-  (pop-to-buffer "*rdictcc*" nil t)
+  (if noselect
+      (display-buffer (get-buffer-create rdictcc-buffer))
+    (pop-to-buffer rdictcc-buffer nil t))
+  (set-buffer rdictcc-buffer)
   (rdictcc-buffer-mode)
   (setq inhibit-read-only t)
   (erase-buffer)
@@ -103,18 +116,27 @@ key bindings. Type `?' in it to get a description."
   (goto-char (point-min))
   (rdictcc-next-translation))
 
+(defun rdictcc-refresh-translation ()
+  "Refresh the `rdictcc-buffer' if the current word under point changed."
+  (interactive)
+  (let ((cw (rdictcc-current-word)))
+    (when (and cw
+               (or (not rdictcc-last-word)
+                   (not (string= cw rdictcc-last-word))))
+      (rdictcc-translate-word cw t))))
+
 (defun rdictcc-current-word ()
   (if (>= emacs-major-version 22)
       (current-word t t) ; emacs 22
     (current-word t)))   ; emacs 21
 
-(defun rdictcc-translate-word-at-point ()
+(defun rdictcc-translate-word-at-point (noselect)
   "Opens a new window showing the translation of the word located
 at point."
-  (interactive)
+  (interactive "P")
   (save-excursion
     (let ((word (rdictcc-current-word)))
-      (rdictcc-translate-word word))))
+      (rdictcc-translate-word word noselect))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
