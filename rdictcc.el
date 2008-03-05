@@ -37,6 +37,12 @@ and convenient German-English (and vice versa) translation."
   :group 'rdictcc
   :type 'string)
 
+(defcustom rdictcc-program-args
+  nil
+  "Options to give to `rdictcc-program', for example -c."
+  :group 'rdictcc
+  :type 'string)
+
 (defcustom rdictcc-buffer
   "*rdictcc*"
   "The name of the buffer showing the translations."
@@ -63,17 +69,19 @@ are only available in GNU Emacs' X11 interface."
 (defvar rdictcc-last-translation nil
   "The last translation (internal use only)")
 
-(defvar rdictcc-version "<2008-03-04 Tue 20:37>"
+(defvar rdictcc-version "<2008-03-05 Wed 10:06>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
   "Translates the given word and returns the result as string."
-  (if (equal word rdictcc-last-word)
+  (if (string= word rdictcc-last-word)
       rdictcc-last-translation
     (let* ((coding-system-for-read  (terminal-coding-system))
            (coding-system-for-write (terminal-coding-system))
            (translation (shell-command-to-string
-                         (concat rdictcc-program " " word))))
+                         (concat rdictcc-program " "
+                                 rdictcc-program-args " "
+                                 word))))
       (setq rdictcc-last-word word)
       (setq rdictcc-last-translation translation))))
 
