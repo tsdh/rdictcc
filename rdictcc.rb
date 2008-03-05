@@ -368,7 +368,7 @@ options = OptionParser.new do |opts|
   opts.separator "Misc options:"
   opts.on("-v", "--version", "Show rdictcc.rb's version") do
     # TODO: Set version after changes!
-    puts "<2008-03-05 Wed 09:29>"
+    puts "<2008-03-05 Wed 18:11>"
     exit 0
   end
 

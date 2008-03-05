@@ -39,7 +39,11 @@ and convenient German-English (and vice versa) translation."
 
 (defcustom rdictcc-program-args
   nil
-  "Options to give to `rdictcc-program', for example -c."
+  "A string of options to give to `rdictcc-program'.
+Let's say your rdictcc database directory is /var/rdictcc/
+instead of the default ~/.rdictcc/ and you prefer the compact
+output format, then you'd set this variable to
+\"-c -d /var/rdictcc\"."
   :group 'rdictcc
   :type 'string)
 
@@ -69,7 +73,7 @@ are only available in GNU Emacs' X11 interface."
 (defvar rdictcc-last-translation nil
   "The last translation (internal use only)")
 
-(defvar rdictcc-version "<2008-03-05 Wed 10:06>"
+(defvar rdictcc-version "<2008-03-05 Wed 18:11>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
