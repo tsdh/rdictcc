@@ -143,13 +143,13 @@ class RDictCcDatabaseBuilder
   private
 
   ##
-  # Writes the contents of '@dict' to DBM file DICT_FILE_DE if sym == :de or
-  # to DICT_FILE_EN otherwise.
+  # Writes the contents of '@dict' to DBM file $dict_file_de if sym == :de or
+  # to $dict_file_en otherwise.
   def write_database( sym )
     if sym == :de
-      db_file = DICT_FILE_DE
+      db_file = $dict_file_de
     else
-      db_file = DICT_FILE_EN
+      db_file = $dict_file_en
     end
 
     if File.exists?(db_file)
@@ -245,8 +245,8 @@ class RDictCcQueryEvaluator
   # Opens each database and yields the given block, handing over the data base
   # handle.
   def read_db
-    for file in [DICT_FILE_DE, DICT_FILE_EN] do
-      if file == DICT_FILE_DE
+    for file in [$dict_file_de, $dict_file_en] do
+      if file == $dict_file_de
         puts "{DE-EN}"
       else
         puts "\n{EN-DE}"
@@ -345,7 +345,11 @@ end
 ##
 # Here we go...
 $dict_dir = File.expand_path '~/.rdictcc'
+$dict_file_de = $dict_dir + '/' + 'dict_de'
+$dict_file_en = $dict_dir + '/' + 'dict_en'
+
 $query_str = ""
+
 options = OptionParser.new do |opts|
   opts.banner = "Usage: rdictcc.rb [database_import_options]\n" +
     "       rdictcc.rb [misc_options]\n" +
@@ -368,7 +372,7 @@ options = OptionParser.new do |opts|
   opts.separator "Misc options:"
   opts.on("-v", "--version", "Show rdictcc.rb's version") do
     # TODO: Set version after changes!
-    puts "<2008-03-05 Wed 18:11>"
+    puts "<2008-03-05 Wed 21:37>"
     exit 0
   end
 
@@ -380,6 +384,8 @@ options = OptionParser.new do |opts|
   opts.on("-d", "--directory PATH",
           "Use PATH instead of ~/.rdictcc/") do |path|
     $dict_dir = File.expand_path path
+    $dict_file_de = $dict_dir + '/' + 'dict_de'
+    $dict_file_en = $dict_dir + '/' + 'dict_en'
   end
 
   opts.on("-h", "--help", "Show this message") do
@@ -413,9 +419,6 @@ end.parse!
 if ARGV.join(" ").empty?
   interactive_mode
 end
-
-DICT_FILE_DE = $dict_dir + '/' + 'dict_de'
-DICT_FILE_EN = $dict_dir + '/' + 'dict_en'
 
 evaluator = RDictCcQueryEvaluator.new
 evaluator.query($query_str.concat(ARGV.join(" ")))

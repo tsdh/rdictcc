@@ -73,7 +73,7 @@ are only available in GNU Emacs' X11 interface."
 (defvar rdictcc-last-translation nil
   "The last translation (internal use only)")
 
-(defvar rdictcc-version "<2008-03-05 Wed 18:11>"
+(defvar rdictcc-version "<2008-03-05 Wed 21:28>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
@@ -143,12 +143,12 @@ key bindings. Type `?' in it to get a description."
     (current-word t)))   ; emacs 21
 
 (defun rdictcc-translate-word-at-point (noselect)
-  "Opens a new window showing the translation of the word located
-at point."
+  "Translate the current word located at point."
   (interactive "P")
   (save-excursion
     (let ((word (rdictcc-current-word)))
-      (rdictcc-translate-word word noselect))))
+      (when word
+        (rdictcc-translate-word word noselect)))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
