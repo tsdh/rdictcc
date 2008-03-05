@@ -90,9 +90,16 @@ class RDictCcEntry
       else
         s << subparts[0] + ":\n"
       end
-      subparts[1].split(/:<>:/).each do |trans|
+      translations = subparts[1].split(/:<>:/)
+      no_of_last_trans = translations.size - 1
+      i = 0
+      translations.each do |trans|
         if @@output_format == :compact
-          s << trans + " / "
+          s << trans
+          if i < no_of_last_trans
+            s << " / "
+          end
+          i += 1
         else
           s << "    - " + trans + "\n"
         end
