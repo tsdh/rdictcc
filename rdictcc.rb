@@ -23,13 +23,6 @@ require 'optparse' # Command line option parsing
 require 'dbm'      # DBM database interface
 
 ##
-# Constants used by all classes
-DICT_DIR = File.expand_path '~/.rdictcc'
-DICT_FILE_DE = DICT_DIR + '/' + 'dict_de'
-DICT_FILE_EN = DICT_DIR + '/' + 'dict_en'
-
-
-##
 # A RDictCcEntry contains a Hash
 #
 #     phrase => [translation1, ..., translationN]
@@ -101,7 +94,7 @@ class RDictCcEntry
         if @@output_format == :compact
           s << trans + " / "
         else
-          s << "    - " + trans + "\n" 
+          s << "    - " + trans + "\n"
         end
       end
       if @@output_format == :compact
@@ -121,8 +114,8 @@ class RDictCcDatabaseBuilder
   # and creates the ~/.rdictcc directory.
   def initialize( import_file )
     @import_file = import_file
-    if !File.exists? DICT_DIR
-      Dir.mkdir DICT_DIR
+    if !File.exists? $dict_dir
+      Dir.mkdir $dict_dir
     end
   end
 
@@ -231,8 +224,9 @@ end
 class RDictCcQueryEvaluator
 
   def initialize
-    if !File.exists? DICT_DIR
-      puts "There's no ~/.rdictcc directory! You have to import an dict.cc\n" +
+    if !File.exists? $dict_dir
+      puts "There's no "+ $dict_dir +
+        " directory! You have to import an dict.cc\n" +
         "database file first. See\n" +
         "  $ rdictcc.rb --help\n" +
         "for more information."
@@ -343,6 +337,7 @@ end
 
 ##
 # Here we go...
+$dict_dir = File.expand_path '~/.rdictcc'
 $query_str = ""
 options = OptionParser.new do |opts|
   opts.banner = "Usage: rdictcc.rb [database_import_options]\n" +
@@ -373,6 +368,11 @@ options = OptionParser.new do |opts|
   opts.on("-S", "--size", "Show the number of entries in the databases") do
     RDictCcQueryEvaluator.new.show_db_sizes
     exit 0
+  end
+
+  opts.on("-d", "--directory PATH",
+          "Use PATH instead of ~/.rdictcc/") do |path|
+    $dict_dir = File.expand_path path
   end
 
   opts.on("-h", "--help", "Show this message") do
@@ -406,6 +406,9 @@ end.parse!
 if ARGV.join(" ").empty?
   interactive_mode
 end
+
+DICT_FILE_DE = $dict_dir + '/' + 'dict_de'
+DICT_FILE_EN = $dict_dir + '/' + 'dict_en'
 
 evaluator = RDictCcQueryEvaluator.new
 evaluator.query($query_str.concat(ARGV.join(" ")))
