@@ -41,6 +41,13 @@ DICT_FILE_EN = DICT_DIR + '/' + 'dict_en'
 # takes a string encoded RDictCcEntry (DBM-value) and formats them
 # userfriendly.
 class RDictCcEntry
+
+  @@output_format = :normal
+
+  def self.set_output_format( format )
+    @@output_format = format
+  end
+
   def initialize
     @value_hash = {}
   end
@@ -80,13 +87,26 @@ class RDictCcEntry
   ##
   # Given a string-encoded (with to_s()) RDictCcEntry formats it in a readable,
   # userfriendly way.
-  def RDictCcEntry.format_str( str )
+  def RDictCcEntry.format_str( str)
     parts = str.strip!.split(/#<>#/)
     s = ""
     parts.each do |part|
       subparts = part.split(/=<>/)
-      s << subparts[0] + ":\n" # That's the description
-      subparts[1].split(/:<>:/).each { |trans| s << "    - " + trans + "\n" }
+      if @@output_format == :compact
+        s << "- " + subparts[0] + ": "
+      else
+        s << subparts[0] + ":\n"
+      end
+      subparts[1].split(/:<>:/).each do |trans|
+        if @@output_format == :compact
+          s << trans + " / "
+        else
+          s << "    - " + trans + "\n" 
+        end
+      end
+      if @@output_format == :compact
+        s << "\n"
+      end
     end
     s
   end
@@ -209,6 +229,7 @@ class RDictCcDatabaseBuilder
 end
 
 class RDictCcQueryEvaluator
+
   def initialize
     if !File.exists? DICT_DIR
       puts "There's no ~/.rdictcc directory! You have to import an dict.cc\n" +
@@ -225,11 +246,9 @@ class RDictCcQueryEvaluator
   def read_db
     for file in [DICT_FILE_DE, DICT_FILE_EN] do
       if file == DICT_FILE_DE
-        puts "DE-EN Translations:"
-        puts "==================="
+        puts "{DE-EN}"
       else
-        puts "\nEN-DE Translations:"
-        puts "==================="
+        puts "\n{EN-DE}"
       end
 
       DBM.open(file, nil, DBM::READER) do |dbm|
@@ -347,7 +366,7 @@ options = OptionParser.new do |opts|
   opts.separator "Misc options:"
   opts.on("-v", "--version", "Show rdictcc.rb's version") do
     # TODO: Set version after changes!
-    puts "<2007-08-08 Wed 18:50>"
+    puts "<2008-03-05 Wed 09:29>"
     exit 0
   end
 
@@ -360,6 +379,13 @@ options = OptionParser.new do |opts|
     puts opts
     exit 0
   end
+
+  opts.separator ""
+  opts.separator "Format options:"
+  opts.on("-c", "--compact", "Use compact output format") do
+    RDictCcEntry.set_output_format :compact
+  end
+
 
   opts.separator ""
   opts.separator "Query option:"
@@ -382,4 +408,4 @@ if ARGV.join(" ").empty?
 end
 
 evaluator = RDictCcQueryEvaluator.new
-evaluator.query $query_str.concat(ARGV.join(" "))
+evaluator.query($query_str.concat(ARGV.join(" ")))
