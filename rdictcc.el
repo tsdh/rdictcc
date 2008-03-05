@@ -302,6 +302,62 @@ mouse pointer."
 ;;; end of tooltip stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; permanent translation mode
+
+(defun rdictcc-forward-char (&optional n)
+  (interactive "p")
+  (forward-char n)
+  (rdictcc-refresh-translation))
+
+(defun rdictcc-backward-char (&optional n)
+  (interactive "p")
+  (backward-char n)
+  (rdictcc-refresh-translation))
+
+(defun rdictcc-next-line (&optional arg try-vscroll)
+  (interactive "p")
+  (next-line arg try-vscroll)
+  (rdictcc-refresh-translation))
+
+(defun rdictcc-previous-line (&optional arg try-vscroll)
+  (interactive "p")
+  (previous-line arg try-vscroll)
+  (rdictcc-refresh-translation))
+
+(defun rdictcc-forward-word (&optional arg)
+  (interactive "p")
+  (forward-word arg)
+  (rdictcc-refresh-translation))
+
+(defun rdictcc-backward-word (&optional arg)
+  (interactive "p")
+  (backward-word arg)
+  (rdictcc-refresh-translation))
+
+(defvar rdictcc-permanent-translation-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [remap forward-char]   'rdictcc-forward-char)
+    (define-key map [remap backward-char]  'rdictcc-backward-char)
+    (define-key map [remap next-line]      'rdictcc-next-line)
+    (define-key map [remap previous-line]  'rdictcc-previous-line)
+    (define-key map [remap forward-word]   'rdictcc-forward-word)
+    (define-key map [remap backward-word]  'rdictcc-backward-word)
+    map)
+  "The keymap used in `rdictcc-permanent-translation-mode'.")
+
+(define-minor-mode rdictcc-permanent-translation-mode
+  "Refresh the `rdictcc-buffer' after every point movement.
+This will remap most point movement commands to rdictcc functions
+that first move point and then update the translation buffer."
+  nil
+  " RDictCcPT"
+  nil
+  rdictcc-permanent-translation-mode-map)
+
+;;; end permanent translation mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (provide 'rdictcc)
 
 ;;; rdictcc ends here
