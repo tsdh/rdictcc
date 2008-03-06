@@ -74,7 +74,7 @@ are only available in GNU Emacs' X11 interface."
   "The last translation (internal use only)")
 
 ;; TODO: Adjust version number after changes!
-(defvar rdictcc-version "<2008-03-06 Thu 14:58>"
+(defvar rdictcc-version "<2008-03-06 Thu 16:17>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
@@ -145,18 +145,29 @@ key bindings. Type `?' in it to get a description."
 
 (defun rdictcc-translate-word-at-point (noselect)
   "Translate the current word located at point.
-If Transient Mark Mode is enabled, translate the marked region
-instead.  If you don't use `transient-mark-mode', you can enable
-it only for the following command by activating the mark with
-`C-SPC C-SPC'."
+If NOSELECT is non-nil, don't select the `rdictcc-buffer'.
+If emacs version is 23+ and Transient Mark Mode is enabled,
+translate the active region instead.  If you don't use
+`transient-mark-mode', you can enable it only for the following
+command by activating the mark with `C-SPC C-SPC'."
   (interactive "P")
-  (save-excursion
-    (let ((word (if (use-region-p)
-                    (buffer-substring-no-properties (region-beginning)
-                                                    (region-end))
-                  (rdictcc-current-word))))
-      (when word
-        (rdictcc-translate-word word noselect)))))
+  (let ((word (if (and (>= emacs-major-version 23)
+                       (use-region-p)) ;; `use-region-p' is new in GNU Emacs 23
+                  (buffer-substring-no-properties (region-beginning)
+                                                  (region-end))
+                (rdictcc-current-word))))
+    (when word
+      (rdictcc-translate-word word noselect))))
+
+(defun rdictcc-translate-region (start end noselect)
+  "Translate the marked region.
+If NOSELECT is non-nil, don't select the `rdictcc-buffer'."
+  (interactive (list (region-beginning)
+                     (region-end)
+                     current-prefix-arg))
+  (let ((word (buffer-substring-no-properties start end)))
+    (when word
+      (rdictcc-translate-word word noselect))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
