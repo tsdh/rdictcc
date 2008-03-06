@@ -73,7 +73,8 @@ are only available in GNU Emacs' X11 interface."
 (defvar rdictcc-last-translation nil
   "The last translation (internal use only)")
 
-(defvar rdictcc-version "<2008-03-05 Wed 21:28>"
+;; TODO: Adjust version number after changes!
+(defvar rdictcc-version "<2008-03-06 Thu 14:58>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
@@ -139,14 +140,21 @@ key bindings. Type `?' in it to get a description."
 
 (defun rdictcc-current-word ()
   (if (>= emacs-major-version 22)
-      (current-word t t) ; emacs 22
+      (current-word t t) ; emacs 22+
     (current-word t)))   ; emacs 21
 
 (defun rdictcc-translate-word-at-point (noselect)
-  "Translate the current word located at point."
+  "Translate the current word located at point.
+If Transient Mark Mode is enabled, translate the marked region
+instead.  If you don't use `transient-mark-mode', you can enable
+it only for the following command by activating the mark with
+`C-SPC C-SPC'."
   (interactive "P")
   (save-excursion
-    (let ((word (rdictcc-current-word)))
+    (let ((word (if (use-region-p)
+                    (buffer-substring-no-properties (region-beginning)
+                                                    (region-end))
+                  (rdictcc-current-word))))
       (when word
         (rdictcc-translate-word word noselect)))))
 
