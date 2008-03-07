@@ -74,7 +74,7 @@ are only available in GNU Emacs' X11 interface."
   "The last translation (internal use only)")
 
 ;; TODO: Adjust version number after changes!
-(defvar rdictcc-version "<2008-03-06 Thu 16:17>"
+(defvar rdictcc-version "<2008-03-07 Fri 15:31>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
@@ -105,38 +105,37 @@ key bindings. Type `?' in it to get a description."
             (read-string (concat "Word to translate (defaults to \"" cw "\"): ")
                          nil nil cw)))
          current-prefix-arg))
-  (let ((translation (rdictcc-translate-word-to-string word)))
+  (if (not (string= word rdictcc-last-word))
+      (let ((translation (rdictcc-translate-word-to-string word)))
+        (when rdictcc-show-translations-in-buffer
+          (rdictcc-update-translation-buffer translation noselect))
+        (when (and rdictcc-show-translations-in-tooltips window-system)
+          (tooltip-show translation)))
     (when rdictcc-show-translations-in-buffer
-      (rdictcc-show-translation-buffer translation noselect))
+      (rdictcc-show-translation-buffer noselect))
     (when (and rdictcc-show-translations-in-tooltips window-system)
-      (tooltip-show translation))))
+      (tooltip-show rdictcc-last-translation))))
 
 (defvar rdictcc-old-window-configuration nil
   "The window configuration which has to be restored when the
 *rdictcc* buffer is closed. (internal use only)")
 
-(defun rdictcc-show-translation-buffer (translation noselect)
+(defun rdictcc-show-translation-buffer (noselect)
   (setq rdictcc-old-window-configuration (current-window-configuration))
   (if noselect
       (display-buffer (get-buffer-create rdictcc-buffer))
-    (pop-to-buffer rdictcc-buffer nil t))
-  (set-buffer rdictcc-buffer)
+    (pop-to-buffer rdictcc-buffer nil t)))
+
+(defun rdictcc-update-translation-buffer (translation noselect)
+  (set-buffer (get-buffer-create rdictcc-buffer))
   (rdictcc-buffer-mode)
   (setq inhibit-read-only t)
   (erase-buffer)
   (insert translation)
   (setq inhibit-read-only nil)
   (goto-char (point-min))
-  (rdictcc-next-translation))
-
-(defun rdictcc-refresh-translation ()
-  "Refresh the `rdictcc-buffer' if the current word under point changed."
-  (interactive)
-  (let ((cw (rdictcc-current-word)))
-    (when (and cw
-               (or (not rdictcc-last-word)
-                   (not (string= cw rdictcc-last-word))))
-      (rdictcc-translate-word cw t))))
+  (rdictcc-next-translation)
+  (rdictcc-show-translation-buffer noselect))
 
 (defun rdictcc-current-word ()
   (if (>= emacs-major-version 22)
@@ -331,32 +330,32 @@ mouse pointer."
 (defun rdictcc-forward-char (&optional n)
   (interactive "p")
   (forward-char n)
-  (rdictcc-refresh-translation))
+  (rdictcc-translate-word-at-point t))
 
 (defun rdictcc-backward-char (&optional n)
   (interactive "p")
   (backward-char n)
-  (rdictcc-refresh-translation))
+  (rdictcc-translate-word-at-point t))
 
 (defun rdictcc-next-line (&optional arg try-vscroll)
   (interactive "p")
   (next-line arg try-vscroll)
-  (rdictcc-refresh-translation))
+  (rdictcc-translate-word-at-point t))
 
 (defun rdictcc-previous-line (&optional arg try-vscroll)
   (interactive "p")
   (previous-line arg try-vscroll)
-  (rdictcc-refresh-translation))
+  (rdictcc-translate-word-at-point t))
 
 (defun rdictcc-forward-word (&optional arg)
   (interactive "p")
   (forward-word arg)
-  (rdictcc-refresh-translation))
+  (rdictcc-translate-word-at-point t))
 
 (defun rdictcc-backward-word (&optional arg)
   (interactive "p")
   (backward-word arg)
-  (rdictcc-refresh-translation))
+  (rdictcc-translate-word-at-point t))
 
 (defvar rdictcc-permanent-translation-mode-map
   (let ((map (make-sparse-keymap)))
