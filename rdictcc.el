@@ -74,7 +74,7 @@ are only available in GNU Emacs' X11 interface."
   "The last translation (internal use only)")
 
 ;; TODO: Adjust version number after changes!
-(defvar rdictcc-version "<2008-03-07 Fri 15:31>"
+(defvar rdictcc-version "<2008-03-07 Fri 15:43>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
@@ -150,7 +150,7 @@ translate the active region instead.  If you don't use
 `transient-mark-mode', you can enable it only for the following
 command by activating the mark with `C-SPC C-SPC'."
   (interactive "P")
-  (let ((word (if (and (>= emacs-major-version 23)
+  (let ((word (if (and (fboundp 'use-region-p)
                        (use-region-p)) ;; `use-region-p' is new in GNU Emacs 23
                   (buffer-substring-no-properties (region-beginning)
                                                   (region-end))
