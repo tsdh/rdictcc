@@ -116,12 +116,7 @@ key bindings. Type `?' in it to get a description."
     (when (and rdictcc-show-translations-in-tooltips window-system)
       (tooltip-show rdictcc-last-translation))))
 
-(defvar rdictcc-old-window-configuration nil
-  "The window configuration which has to be restored when the
-*rdictcc* buffer is closed. (internal use only)")
-
 (defun rdictcc-show-translation-buffer (noselect)
-  (setq rdictcc-old-window-configuration (current-window-configuration))
   (if noselect
       (display-buffer (get-buffer-create rdictcc-buffer))
     (pop-to-buffer rdictcc-buffer nil t)))
@@ -142,6 +137,10 @@ key bindings. Type `?' in it to get a description."
       (current-word t t) ; emacs 22+
     (current-word t)))   ; emacs 21
 
+(defvar rdictcc-last-window-configuration nil
+  "The window configuration which was active when
+`rdictcc-translate-word-at-point' was called.")
+
 (defun rdictcc-translate-word-at-point (noselect)
   "Translate the current word located at point.
 If NOSELECT is non-nil, don't select the `rdictcc-buffer'.
@@ -150,6 +149,7 @@ translate the active region instead.  If you don't use
 `transient-mark-mode', you can enable it only for the following
 command by activating the mark with `C-SPC C-SPC'."
   (interactive "P")
+  (setq rdictcc-last-window-configuration (current-window-configuration))
   (let ((word (if (and (fboundp 'use-region-p)
                        (use-region-p)) ;; `use-region-p' is new in GNU Emacs 23
                   (buffer-substring-no-properties (region-beginning)
@@ -180,7 +180,7 @@ is displayed is highlighted with `font-lock-keyword-face'."
   ;;;;;;;;;;;;;;;
   ;; Keymap Stuff
   (suppress-keymap rdictcc-buffer-mode-map)
-  (define-key rdictcc-buffer-mode-map (kbd "q") 'rdictcc-close-buffer)
+  (define-key rdictcc-buffer-mode-map (kbd "q") 'rdictcc-restore-window-config)
   (define-key rdictcc-buffer-mode-map (kbd "o") 'other-window)
   (define-key rdictcc-buffer-mode-map (kbd "RET")
     'rdictcc-replace-word-with-translation-at-point)
@@ -198,21 +198,20 @@ is displayed is highlighted with `font-lock-keyword-face'."
         ;; The translated word is highlighted in *rdictcc* buffer.
         `((,(concat "\\b" rdictcc-last-word "\\b")) t t)))
 
+(defun rdictcc-restore-window-config ()
+  "Restore `rdictcc-last-window-configuration'."
+  (interactive)
+  (set-window-configuration rdictcc-last-window-configuration))
+
 (defun rdictcc-replace-word-with-translation-at-point ()
   "Replaces the translated word with the translation at point in
 *rdictcc* buffer."
   (interactive)
   (let ((chosen-translation (rdictcc-current-word)))
-    (rdictcc-close-buffer)
+    (rdictcc-restore-window-config)
     (search-forward-regexp "\\>")
     (backward-kill-word 1)
     (insert chosen-translation)))
-
-(defun rdictcc-close-buffer ()
-  "Closes the *rdictcc* buffer and restores the window
-configuration which existed before the translation."
-  (interactive)
-  (set-window-configuration rdictcc-old-window-configuration))
 
 (defun rdictcc-next-translation ()
   "Go to the next translation in *rdictcc* buffer."
