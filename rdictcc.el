@@ -168,7 +168,9 @@ command by activating the mark with `C-SPC C-SPC'."
       (rdictcc-translate-word word noselect))))
 
 (defun rdictcc-translate-region (start end noselect)
-  "Translate the marked region.
+  "Translate the marked region.  This is typically a part of a single word.
+Useful for word stem search and singular form search.  It does *not* work
+on groups of words.
 If NOSELECT is non-nil, don't select the `rdictcc-buffer'."
   (interactive (list (region-beginning)
                      (region-end)

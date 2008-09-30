@@ -328,10 +328,11 @@ end
 
 def interactive_mode
   puts "Welcome to rdictcc's interactive mode. This mode will read from stdin\n" +
-    "and print the translations until it reads ^Q (literally, not Ctrl-Q)."
+    "and print the translations until you type C-d (that is Ctrl-d)."
   evaluator = RDictCcQueryEvaluator.new
   print "=> "
-  while word = gets.chomp
+  while word = gets
+    word.chomp!
     puts
     if word == "^Q" then break end
     evaluator.query word
