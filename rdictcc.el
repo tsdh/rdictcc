@@ -6,6 +6,7 @@
 
 ;; Patches and contributions:
 ;;   - Richard G Riley <rileyrgdev@gmail.com>
+;;   - Martin Pohlack <mp26@os.inf.tu-dresden.de>
 
 ;; This program is free software; you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by the Free
@@ -74,7 +75,7 @@ are only available in GNU Emacs' X11 interface."
   "The last translation (internal use only)")
 
 ;; TODO: Adjust version number after changes!
-(defvar rdictcc-version "<2008-03-07 Fri 15:43>"
+(defvar rdictcc-version "<2008-09-30 Tue 15:09>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
@@ -137,6 +138,14 @@ key bindings. Type `?' in it to get a description."
       (current-word t t) ; emacs 22+
     (current-word t)))   ; emacs 21
 
+(defun rdictcc-current-line ()
+  "Returns the text of the current line in the *rdictcc* buffer
+without hypen or trailing :."
+  (save-excursion
+    (let ((line (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+      (string-match "^ *[-]? *\\([a-zA-ZäöüÄÖÜß()',./]+[a-zA-ZäöüÄÖÜß()',./\\ -]*[a-zA-ZäöüÄÖÜß()',./\\-]+\\) *.*$" line)
+      (match-string 1 line))))
+
 (defvar rdictcc-last-window-configuration nil
   "The window configuration which was active when
 `rdictcc-translate-word-at-point' was called.")
@@ -184,6 +193,8 @@ is displayed is highlighted with `font-lock-keyword-face'."
   (define-key rdictcc-buffer-mode-map (kbd "o") 'other-window)
   (define-key rdictcc-buffer-mode-map (kbd "RET")
     'rdictcc-replace-word-with-translation-at-point)
+  (define-key rdictcc-buffer-mode-map (kbd "SPC")
+    'rdictcc-replace-word-with-translation-at-line)
   (define-key rdictcc-buffer-mode-map (kbd "?") 'describe-mode)
   (define-key rdictcc-buffer-mode-map (kbd "n") 'rdictcc-next-translation)
   (define-key rdictcc-buffer-mode-map (kbd "p") 'rdictcc-previous-translation)
@@ -208,6 +219,16 @@ is displayed is highlighted with `font-lock-keyword-face'."
 *rdictcc* buffer."
   (interactive)
   (let ((chosen-translation (rdictcc-current-word)))
+    (rdictcc-restore-window-config)
+    (search-forward-regexp "\\>")
+    (backward-kill-word 1)
+    (insert chosen-translation)))
+
+(defun rdictcc-replace-word-with-translation-at-line ()
+  "Replaces the translated word with the translation at current
+line in *rdictcc* buffer."
+  (interactive)
+  (let ((chosen-translation (rdictcc-current-line)))
     (rdictcc-restore-window-config)
     (search-forward-regexp "\\>")
     (backward-kill-word 1)
