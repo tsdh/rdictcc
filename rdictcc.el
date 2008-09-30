@@ -75,7 +75,7 @@ are only available in GNU Emacs' X11 interface."
   "The last translation (internal use only)")
 
 ;; TODO: Adjust version number after changes!
-(defvar rdictcc-version "<2008-09-30 Tue 15:09>"
+(defvar rdictcc-version "<2008-09-30 Tue 15:36>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
@@ -143,7 +143,9 @@ key bindings. Type `?' in it to get a description."
 without hypen or trailing :."
   (save-excursion
     (let ((line (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
-      (string-match "^ *[-]? *\\([a-zA-ZäöüÄÖÜß()',./]+[a-zA-ZäöüÄÖÜß()',./\\ -]*[a-zA-ZäöüÄÖÜß()',./\\-]+\\) *.*$" line)
+      (string-match
+       "^ *[-]? *\\([a-zA-ZäöüÄÖÜß()',./]+[a-zA-ZäöüÄÖÜß()',./\\ -]*[a-zA-ZäöüÄÖÜß()',./\\-]+\\) *.*$"
+       line)
       (match-string 1 line))))
 
 (defvar rdictcc-last-window-configuration nil
