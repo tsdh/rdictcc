@@ -61,13 +61,15 @@ output format, then you'd set this variable to
 Each function gets 2 parameters:
 
   1. the word that should be translated
-  3. a boolean which tells if the thing that shows the
+  2. a boolean which tells if the thing that shows the
      translation should be selected.  That makes only sense
      for emacs windows, though.
 
 The function should do the translation itself using
 `rdictcc-translate-word-to-string'.  That's not needed if the
-first parameter equals `rdictcc-last-word', though.
+first parameter equals `rdictcc-last-word', though.  In that case
+the translation of `rdictcc-last-word' is available in
+`rdictcc-last-translation'.
 
 Two functions come with rdictcc:
 
@@ -85,7 +87,7 @@ Have fun writing your own."
   "The last translation (internal use only)")
 
 ;; TODO: Adjust version number after changes!
-(defvar rdictcc-version "<2008-12-12 Fri 19:14>"
+(defvar rdictcc-version "<2008-12-21 Sun 17:14>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
@@ -113,7 +115,7 @@ translation should be shown."
                          nil nil cw)))
          current-prefix-arg))
   (dolist (fun rdictcc-show-translation-functions)
-      (funcall fun word noselect)))
+    (funcall fun word noselect)))
 
 (defun rdictcc-show-translation-buffer (word noselect)
   "Show the translation of WORD in `rdictcc-buffer' and select it
