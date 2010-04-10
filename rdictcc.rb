@@ -81,7 +81,7 @@ class RDictCcEntry
   ##
   # Given a string-encoded (with to_s()) RDictCcEntry formats it in a readable,
   # userfriendly way.
-  def RDictCcEntry.format_str( str)
+  def RDictCcEntry.format_str(str)
     parts = str.strip!.split(/#<>#/)
     s = ""
     parts.each do |part|
@@ -94,6 +94,7 @@ class RDictCcEntry
       translations = subparts[1].split(/:<>:/)
       no_of_last_trans = translations.size - 1
       i = 0
+      c = 0
       translations.each do |trans|
         if @@output_format == :compact
           s << trans
@@ -101,6 +102,11 @@ class RDictCcEntry
             s << " / "
           end
           i += 1
+          c += 3 + trans.size
+          if c > 60 and i < no_of_last_trans
+            c = 0
+            s << "\n  "
+          end
         else
           s << "    - " + trans + "\n"
         end
