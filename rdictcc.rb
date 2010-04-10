@@ -1,7 +1,8 @@
 #!/usr/bin/ruby -w
+# -*- coding: utf-8 -*-
 
 ###############################################################################
-# Copyright (C) 2006, 2007 by Tassilo Horn
+# Copyright (C) 2006, 2007, 2009, 2009, 2010 by Tassilo Horn
 #
 # Author: Tassilo Horn <tassilo@member.fsf.org>
 #
@@ -131,11 +132,11 @@ class RDictCcDatabaseBuilder
   # database files.
   def import
     # German => English
-    read_dict_file(:de)
-    write_database(:de)
+    read_dict_file(:langA)
+    write_database(:langA)
     # English => German
-    read_dict_file(:en)
-    write_database(:en)
+    read_dict_file(:langB)
+    write_database(:langB)
   end
 
   ##
@@ -143,13 +144,13 @@ class RDictCcDatabaseBuilder
   private
 
   ##
-  # Writes the contents of '@dict' to DBM file $dict_file_de if sym == :de or
-  # to $dict_file_en otherwise.
+  # Writes the contents of '@dict' to DBM file $dict_file_a if sym == :langA or
+  # to $dict_file_b otherwise.
   def write_database( sym )
-    if sym == :de
-      db_file = $dict_file_de
+    if sym == :langA
+      db_file = $dict_file_a
     else
-      db_file = $dict_file_en
+      db_file = $dict_file_b
     end
 
     if File.exists?(db_file)
@@ -175,8 +176,8 @@ class RDictCcDatabaseBuilder
   end
 
   ##
-  # Builds the '@dict' Hash from 'dict_file'. If symbol 'sym' is :de, the
-  # DE-EN-Dictionary will be build, else the EN-DE is build.
+  # Builds the '@dict' Hash from 'dict_file'. If symbol 'sym' is :langA, the
+  # LANG_A-LANG_B-Dictionary will be build, else the LANG_B-LANG_A is build.
   def read_dict_file( sym )
     @dict = {}
     # No queries allowed until reading finishes
@@ -196,10 +197,10 @@ class RDictCcDatabaseBuilder
   # Add the line 'str' to '@dict'.
   def add_line( str, sym )
     # split the line
-    if sym == :de
-      phrase, translation = str.split('::')
+    if sym == :langA
+      phrase, translation = str.split("\t")
     else
-      translation, phrase = str.split('::')
+      translation, phrase = str.split("\t")
     end
     word = extract_word(phrase)
 
@@ -245,11 +246,11 @@ class RDictCcQueryEvaluator
   # Opens each database and yields the given block, handing over the data base
   # handle.
   def read_db
-    for file in [$dict_file_de, $dict_file_en] do
-      if file == $dict_file_de
-        puts "{DE-EN}"
+    for file in [$dict_file_a, $dict_file_b] do
+      if file == $dict_file_a
+        puts "*** A => B ***"
       else
-        puts "\n{EN-DE}"
+        puts "\n*** B => A ***"
       end
 
       DBM.open(file, nil, DBM::READER) do |dbm|
@@ -346,8 +347,8 @@ end
 ##
 # Here we go...
 $dict_dir = File.expand_path '~/.rdictcc'
-$dict_file_de = $dict_dir + '/' + 'dict_de'
-$dict_file_en = $dict_dir + '/' + 'dict_en'
+$dict_file_a = $dict_dir + '/' + 'dict_a'
+$dict_file_b = $dict_dir + '/' + 'dict_b'
 
 $query_str = ""
 
@@ -373,7 +374,7 @@ options = OptionParser.new do |opts|
   opts.separator "Misc options:"
   opts.on("-v", "--version", "Show rdictcc.rb's version") do
     # TODO: Set version after changes!
-    puts "<2008-03-05 Wed 21:37>"
+    puts "<2010-04-10 Sat 12:40>"
     exit 0
   end
 
@@ -385,8 +386,8 @@ options = OptionParser.new do |opts|
   opts.on("-d", "--directory PATH",
           "Use PATH instead of ~/.rdictcc/") do |path|
     $dict_dir = File.expand_path path
-    $dict_file_de = $dict_dir + '/' + 'dict_de'
-    $dict_file_en = $dict_dir + '/' + 'dict_en'
+    $dict_file_a = $dict_dir + '/' + 'dict_a'
+    $dict_file_b = $dict_dir + '/' + 'dict_b'
   end
 
   opts.on("-h", "--help", "Show this message") do
