@@ -248,9 +248,9 @@ class RDictCcQueryEvaluator
   def read_db
     for file in [$dict_file_a, $dict_file_b] do
       if file == $dict_file_a
-        puts "*** A => B ***"
+        puts "====================[ A => B ]===================="
       else
-        puts "\n*** B => A ***"
+        puts "====================[ B => A ]===================="
       end
 
       DBM.open(file, nil, DBM::READER) do |dbm|
