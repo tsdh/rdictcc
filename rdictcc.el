@@ -87,7 +87,7 @@ Have fun writing your own."
   "The last translation (internal use only)")
 
 ;; TODO: Adjust version number after changes!
-(defvar rdictcc-version "<2008-12-21 Sun 17:14>"
+(defvar rdictcc-version "<2010-04-12 Mon 11:18>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
@@ -155,10 +155,17 @@ if NOSELECT is non-nil."
 without hypen or trailing :."
   (save-excursion
     (let ((line (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
-      (string-match
-       "^ *[-]? *\\([a-zA-ZäöüÄÖÜß()',./]+[a-zA-ZäöüÄÖÜß()',./\\ -]*[a-zA-ZäöüÄÖÜß()',./\\-]+\\) *.*$"
-       line)
-      (match-string 1 line))))
+      (if (string-match "^\\(-\\|[[:space:]]+[^-]\\)" line)
+          (progn
+            (search-backward-regexp "[/:]" (line-beginning-position) t)
+            (forward-char 2)
+            (let ((beg (point)))
+              (search-forward-regexp "\\([/]\\|$\\)" (line-end-position) t)
+              (buffer-substring-no-properties beg (point))))
+        (string-match
+         "^ *[-]? *\\([a-zA-ZäöüÄÖÜß()',./]+[a-zA-ZäöüÄÖÜß()',./\\ -]*[a-zA-ZäöüÄÖÜß()',./\\-]+\\) *.*$"
+         line)
+        (match-string 1 line)))))
 
 (defvar rdictcc-last-window-configuration nil
   "The window configuration which was active when

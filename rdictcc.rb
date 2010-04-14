@@ -137,10 +137,9 @@ class RDictCcDatabaseBuilder
   # Imports the dict.cc file given in the constructor and builds/writes the
   # database files.
   def import
-    # German => English
     read_dict_file(:langA)
     write_database(:langA)
-    # English => German
+
     read_dict_file(:langB)
     write_database(:langB)
   end
@@ -229,7 +228,7 @@ class RDictCcDatabaseBuilder
     w = phrase.gsub(/(\([^(]*\)|\{[^{]*\}|\[[^\[]*\])/, '').strip.downcase
     return nil if w.empty? # No empty strings
     # Now return the longest word, hoping that it's the most important, too
-    ary = w.gsub(/[^üäöß\w\s-]/, '').split # öäüß are no word chars currently!
+    ary = w.gsub(/[^üäöÜÄÖß\w\s-]/, '').split # öäüß are no word chars ATM!
     ary.sort!{ |x,y| y.length <=> x.length }
     ary[0] # The longest element is the first
   end
@@ -380,7 +379,7 @@ options = OptionParser.new do |opts|
   opts.separator "Misc options:"
   opts.on("-v", "--version", "Show rdictcc.rb's version") do
     # TODO: Set version after changes!
-    puts "<2010-04-10 Sat 12:40>"
+    puts "<2010-04-14 Wed 14:42>"
     exit 0
   end
 
