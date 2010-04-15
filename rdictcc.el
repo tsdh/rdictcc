@@ -87,7 +87,7 @@ Have fun writing your own."
   "The last translation (internal use only)")
 
 ;; TODO: Adjust version number after changes!
-(defvar rdictcc-version "<2010-04-12 Mon 11:18>"
+(defvar rdictcc-version "<2010-04-15 Thu 10:14>"
   "rdictcc.el's version")
 
 (defun rdictcc-translate-word-to-string (word)
@@ -160,7 +160,8 @@ without hypen or trailing :."
             (search-backward-regexp "[/:]" (line-beginning-position) t)
             (forward-char 2)
             (let ((beg (point)))
-              (search-forward-regexp "\\([/]\\|$\\)" (line-end-position) t)
+              (search-forward-regexp "[[:space:]]*\\([/]\\|$\\)" (line-end-position) t)
+              (goto-char (match-beginning 0))
               (buffer-substring-no-properties beg (point))))
         (string-match
          "^ *[-]? *\\([a-zA-ZäöüÄÖÜß()',./]+[a-zA-ZäöüÄÖÜß()',./\\ -]*[a-zA-ZäöüÄÖÜß()',./\\-]+\\) *.*$"

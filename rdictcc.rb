@@ -210,7 +210,7 @@ class RDictCcDatabaseBuilder
     word = extract_word(phrase)
 
     ## debug
-    # puts word
+    #puts word
     ## debug
 
     # Add another entry
@@ -228,7 +228,7 @@ class RDictCcDatabaseBuilder
     w = phrase.gsub(/(\([^(]*\)|\{[^{]*\}|\[[^\[]*\])/, '').strip.downcase
     return nil if w.empty? # No empty strings
     # Now return the longest word, hoping that it's the most important, too
-    ary = w.gsub(/[^üäöÜÄÖß\w\s-]/, '').split # öäüß are no word chars ATM!
+    ary = w.gsub(/[.,-<>]/, ' ').strip.split do |w| w.strip! end
     ary.sort!{ |x,y| y.length <=> x.length }
     ary[0] # The longest element is the first
   end
@@ -379,7 +379,7 @@ options = OptionParser.new do |opts|
   opts.separator "Misc options:"
   opts.on("-v", "--version", "Show rdictcc.rb's version") do
     # TODO: Set version after changes!
-    puts "<2010-04-14 Wed 14:42>"
+    puts "<2010-04-14 Wed 19:21>"
     exit 0
   end
 
