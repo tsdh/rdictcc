@@ -201,6 +201,11 @@ class RDictCcDatabaseBuilder
   ##
   # Add the line 'str' to '@dict'.
   def add_line( str, sym )
+    if !str.include?("\t")
+      puts "Skipping syntactically broken line '#{str}'"
+      return
+    end
+
     # split the line
     if sym == :langA
       phrase, translation = str.split("\t")
