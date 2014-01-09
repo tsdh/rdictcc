@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 ###############################################################################
-# Copyright (C) 2006, 2007, 2009, 2009, 2010 by Tassilo Horn
+# Copyright (C) 2006-2014 by Tassilo Horn
 #
-# Author: Tassilo Horn <tassilo@member.fsf.org>
+# Author: Tassilo Horn <tassilo@gnu.org>
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,10 @@
 # this program ; see the file COPYING.  If not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 ###############################################################################
+
+##
+# What ruby version?  It works fine with ruby 1.8 and 2.0.  I think, there were
+# some issues with 1.9 though, but I can't remember now.
 
 require 'optparse' # Command line option parsing
 require 'dbm'      # DBM database interface
@@ -362,7 +366,7 @@ $dict_file_b = $dict_dir + '/' + 'dict_b'
 
 $query_str = ""
 
-options = OptionParser.new do |opts|
+OptionParser.new do |opts|
   opts.banner = "Usage: rdictcc.rb [database_import_options]\n" +
     "       rdictcc.rb [misc_options]\n" +
     "       rdictcc.rb [query_option] QUERY\n" +
@@ -384,7 +388,7 @@ options = OptionParser.new do |opts|
   opts.separator "Misc options:"
   opts.on("-v", "--version", "Show rdictcc.rb's version") do
     # TODO: Set version after changes!
-    puts "<2010-04-14 Wed 19:21>"
+    puts "<2014-01-09 Thu>"
     exit 0
   end
 
