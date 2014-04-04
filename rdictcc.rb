@@ -132,7 +132,7 @@ class RDictCcDatabaseBuilder
   # and creates the ~/.rdictcc directory.
   def initialize( import_file )
     @import_file = import_file
-    if !File.exists? $dict_dir
+    if !File.exist? $dict_dir
       Dir.mkdir $dict_dir
     end
   end
@@ -162,7 +162,7 @@ class RDictCcDatabaseBuilder
       db_file = $dict_file_b
     end
 
-    if File.exists?(db_file)
+    if File.exist?(db_file)
       puts "** Going to delete old database #{db_file}"
       File.delete(db_file)
       puts "** Deleted old database #{db_file}"
@@ -246,7 +246,7 @@ end
 class RDictCcQueryEvaluator
 
   def initialize
-    if !File.exists? $dict_dir
+    if !File.exist? $dict_dir
       puts "There's no "+ $dict_dir +
         " directory! You have to import an dict.cc\n" +
         "database file first. See\n" +
