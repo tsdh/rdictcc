@@ -237,7 +237,7 @@ class RDictCcDatabaseBuilder
     w = phrase.gsub(/(\([^(]*\)|\{[^{]*\}|\[[^\[]*\])/, '').strip.downcase
     return nil if w.empty? # No empty strings
     # Now return the longest word, hoping that it's the most important, too
-    ary = w.gsub(/[.,\-<>]/, ' ').strip.split do |i| i.strip! end
+    ary = w.gsub(/[.,\-<>]/, ' ').strip.split.map! do |i| i.strip end
     ary.sort!{ |x,y| y.length <=> x.length }
     ary[0] # The longest element is the first
   end
